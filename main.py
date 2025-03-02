@@ -57,11 +57,11 @@ def read_root(bookname:str):
     # Exclude the first one as it is the input movie itself
     recommended_movie_indices = indices.flatten()[1:]
 
-    # Display movie titles based on knn model
-    print('\nMovies suggested for you:\n')
+    
     title_from_index=[]
     for i, index in enumerate(recommended_movie_indices, start=1):
-        title_from_index.append({"title":movies_data.iloc[index]['title'],"cover":movies_data.iloc[index]['coverImg']})
+        similarity_score = 1 - distances[0][i] 
+        title_from_index.append({"title":movies_data.iloc[index]['title'],"cover":movies_data.iloc[index]['coverImg'],"similarity_score":similarity_score})
         
     
    return title_from_index
