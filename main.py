@@ -5,10 +5,19 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.neighbors import NearestNeighbors
 import difflib
+from fastapi.middleware.cors import CORSMiddleware
 
 
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
 
 @app.get("/")
 def read_root(bookname:str):
@@ -18,7 +27,7 @@ def read_root(bookname:str):
    movies_data = movies_data.reset_index()
    print("TITLE",bookname)
 # Data cleaning
-   selected_features = ['title', 'author', 'genres', 'series', 'likedPercent']
+   selected_features = ['title', 'author', 'genres']
    for feature in selected_features:
      movies_data[feature] = movies_data[feature].fillna('')
 
@@ -26,7 +35,7 @@ def read_root(bookname:str):
    movies_data['likedPercent'] = movies_data['likedPercent'].astype(str)
 
 # Create combined features
-   combined_features = movies_data['title'] + ' ' + movies_data['author'] +  movies_data['genres']  + movies_data['series'] + ' ' + movies_data['likedPercent']
+   combined_features = movies_data['title'] + ' ' + movies_data['author'] +  movies_data['genres']
 
 # Vectorization
    vectorizer = TfidfVectorizer()
@@ -61,7 +70,7 @@ def read_root(bookname:str):
     title_from_index=[]
     for i, index in enumerate(recommended_movie_indices, start=1):
         similarity_score = 1 - distances[0][i] 
-        title_from_index.append({"title":movies_data.iloc[index]['title'],"cover":movies_data.iloc[index]['coverImg'],"similarity_score":similarity_score})
+        title_from_index.append({"title":movies_data.iloc[index]['title'],"author":movies_data.iloc[index]['author'],"cover":movies_data.iloc[index]['coverImg'],"similarity_score":similarity_score})
         
     
    return title_from_index
